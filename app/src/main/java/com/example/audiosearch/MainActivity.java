@@ -1,5 +1,8 @@
 package com.example.audiosearch;
 
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL;
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +21,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.FFmpeg;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,12 +70,29 @@ public class MainActivity extends AppCompatActivity {
             map.apply();
         }
 
-
         if(!f_count.exists()){
             SharedPreferences.Editor cnt= getSharedPreferences("COUNT_PERF",Context.MODE_PRIVATE).edit();
             cnt.putInt("counter",0);
             cnt.apply();
         }
+        String p="storage/emulated/0/Android/"+getPackageName()+"/converted/";
+        File fd=new File(p);
+        if(!fd.exists() && !fd.isDirectory())
+        {// create empty directory
+            if (fd.mkdirs())
+            {
+                Log.d("tilak","App dir created");
+            }
+            else
+            {
+                Log.d("tilak","Unable to create app dir!");
+            }
+        }
+        else
+        {
+            Log.d("tilak","App dir already exists");
+        }
+        Log.d("tilak",p);
 
 
 
@@ -78,34 +101,20 @@ public class MainActivity extends AppCompatActivity {
         buttonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 editTextSearch.setText("");
+                String f_in="storage/emulated/0/Download/Atrangi_Re.mp4";
 
-          //  String p=Environment.getExternalStorageDirectory().getAbsolutePath();
-                String p="storage/emulated/0/Android/"+getPackageName()+"/converted/";
+                int rc = FFmpeg.execute("-i "+ f_in+" storage/emulated/0/Download/file2.wav");
 
-                File fd=new File(p);
-
-                if(!fd.exists() && !fd.isDirectory())
-                {
-                    // create empty directory
-                    if (fd.mkdirs())
-                    {
-                        Log.i("CreateDir","App dir created");
-                    }
-                    else
-                    {
-                        Log.w("CreateDir","Unable to create app dir!");
-                    }
-                }
-                else
-                {
-                    Log.i("CreateDir","App dir already exists");
+                if (rc == RETURN_CODE_SUCCESS) {
+                    Log.i(Config.TAG, "Command execution completed successfully.");
+                } else if (rc == RETURN_CODE_CANCEL) {
+                    Log.i(Config.TAG, "Command execution cancelled by user.");
+                } else {
+                    Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+                    Config.printLastCommandOutput(Log.INFO);
                 }
 
-
-
-            Log.d("tilak",p);
 
             }
         });
@@ -116,7 +125,11 @@ public class MainActivity extends AppCompatActivity {
                 String word=editTextSearch.getText().toString();
 
                 ArrayList<String> audioList=searchAudioFiles.searchFiles(word);
-                audioAdaptor adaptor=new audioAdaptor(audioList,getApplicationContext(),mplayer);
+//                if(mplayer!=null){
+//                    mplayer.stop();
+//                    mplayer.reset();
+//                }
+                audioAdaptor adaptor=new audioAdaptor(audioList,getApplication(),mplayer);
                 recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.super.getApplicationContext()));
                 recyclerView.setAdapter(adaptor);
 

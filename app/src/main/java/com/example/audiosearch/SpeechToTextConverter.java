@@ -58,14 +58,58 @@ public class SpeechToTextConverter {
             ByteString audioBytes = ByteString.copyFrom(data);
 
             // Configure request with local raw PCM audio
-            RecognitionConfig config =
-                    RecognitionConfig.newBuilder()
-                            .setEncoding(RecognitionConfig.AudioEncoding.OGG_OPUS)
-                            .setLanguageCode("en-US")
-                            .setSampleRateHertz(16000)
-                            .setEnableWordTimeOffsets(true)
-                            .build();
+            RecognitionConfig config=null;
+            String ext=getExtension(fileName);
+            if(ext=="opus"){
+                Log.d("tilak","extension: "+ext);
+                config =
+                        RecognitionConfig.newBuilder()
+                                .setEncoding(RecognitionConfig.AudioEncoding.OGG_OPUS)
+                                .setLanguageCode("en-US")
+                                .setSampleRateHertz(16000)
+                                .setEnableWordTimeOffsets(true)
+                                .build();
+
+            }else if(ext=="wav"){
+                Log.d("tilak","extension: "+ext);
+                config =
+                        RecognitionConfig.newBuilder()
+                                .setEncoding(RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED)
+                                .setLanguageCode("en-US")
+                                .setSampleRateHertz(16000)
+                                .setEnableWordTimeOffsets(true)
+                                .build();
+            }else if(ext=="flac"){
+                Log.d("tilak","extension: "+ext);
+                config =
+                        RecognitionConfig.newBuilder()
+                                .setEncoding(RecognitionConfig.AudioEncoding.FLAC)
+                                .setLanguageCode("en-US")
+                                .setEnableWordTimeOffsets(true)
+                                .build();
+            }else if(ext=="amr"){
+                Log.d("tilak","extension: "+ext);
+                config =
+                        RecognitionConfig.newBuilder()
+                                .setEncoding(RecognitionConfig.AudioEncoding.AMR_WB)
+                                .setLanguageCode("en-US")
+                                .setEnableWordTimeOffsets(true)
+                                .setSampleRateHertz(16000)
+                                .build();
+            }else{
+                Log.d("tilak","extension:else "+ext);
+                config =
+                        RecognitionConfig.newBuilder()
+                                .setEncoding(RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED)
+                                .setLanguageCode("en-US")
+                                .setEnableWordTimeOffsets(true)
+
+                                .build();
+            }
             RecognitionAudio audio = RecognitionAudio.newBuilder().setContent(audioBytes).build();
+
+
+
 
             // Use non-blocking call for getting file transcription
 
@@ -118,6 +162,19 @@ public class SpeechToTextConverter {
             myOutWriter.close();
             fOut.close();
         }
+    }
+
+
+    private String getExtension(String path){
+        String result="";
+        for(int i=0;i<path.length();i++){
+            if(path.charAt(i)=='.'){
+                result ="";
+            }else{
+                result=result+path.charAt(i);
+            }
+        }
+        return result;
     }
 
 
