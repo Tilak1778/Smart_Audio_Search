@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
-    android:background="@color/cardview_dark_background"
+    android:background="@color/black"
     >
 
     <EditText

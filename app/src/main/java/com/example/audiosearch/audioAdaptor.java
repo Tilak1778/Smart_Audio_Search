@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
@@ -65,8 +66,9 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
         String item=mAudioList.get(position);
         holder.bind(position);
         holder.itemTextView.setText(getTitle(item));
-
-        holder.itemTextView.setOnClickListener(new View.OnClickListener() {
+        holder.countTextView.setText("Count: ");
+        holder.timeTextView.setText("Time: ");
+        holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("tilak","item: Clicked: "+holder.getAdapterPosition());
@@ -101,6 +103,7 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
                         }
                         mMediaPlayer.setDataSource(mContext, Uri.parse(audioPath));
                         mMediaPlayer.prepare();
+                        //mMediaPlayer.seekTo(10000);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -116,6 +119,9 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
                             holder.equalizerView.stopBars();
                             holder.equalizerView.setVisibility(View.INVISIBLE);
                             holder.itemTextView.setTextColor(mContext.getColor(R.color.white));
+                            holder.timeTextView.setTextColor(mContext.getColor(R.color.white));
+                            holder.countTextView.setTextColor(mContext.getColor(R.color.white));
+
                             Log.d("tilak","visibility: " +holder.equalizerView.getVisibility());
 
 
@@ -143,12 +149,16 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView itemTextView;
+        TextView itemTextView,countTextView,timeTextView;
         EqualizerView equalizerView;
+        ConstraintLayout layout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemTextView=itemView.findViewById(R.id.item_textview);
+            countTextView=itemView.findViewById(R.id.textview_count);
+            timeTextView=itemView.findViewById(R.id.textview_timeStamp);
             equalizerView=itemView.findViewById(R.id.equalizer_anim);
+            layout=itemView.findViewById(R.id.layout_constraint);
 
         }
         public void bind(int index){
@@ -156,10 +166,14 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
                 equalizerView.setVisibility(View.VISIBLE);
                 equalizerView.animateBars();
                 itemTextView.setTextColor(mContext.getResources().getColor(R.color.cherry_red));
+                timeTextView.setTextColor(mContext.getResources().getColor(R.color.cherry_red));
+                countTextView.setTextColor(mContext.getResources().getColor(R.color.cherry_red));
             }else{
-                    equalizerView.stopBars();
-                    equalizerView.setVisibility(View.INVISIBLE);
-                    itemTextView.setTextColor(mContext.getResources().getColor(R.color.white));
+                equalizerView.stopBars();
+                equalizerView.setVisibility(View.INVISIBLE);
+                itemTextView.setTextColor(mContext.getResources().getColor(R.color.white));
+                timeTextView.setTextColor(mContext.getResources().getColor(R.color.white));
+                countTextView.setTextColor(mContext.getResources().getColor(R.color.white));
             }
         }
 

@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        setContentView(R.layout.activity_main);
          buttonClear=findViewById(R.id.button_clear);
          buttonSearch=findViewById(R.id.button_search);
          editTextSearch=findViewById(R.id.edittext_search);
@@ -73,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
         //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         //    checkPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
         //}
+        if(savedInstanceState!=null){
+            String st=savedInstanceState.getString("state");
+            buttonStart.setText(st);
+        }
+
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 Snackbar.make(findViewById(android.R.id.content), "Permission needed!", Snackbar.LENGTH_INDEFINITE)
@@ -136,18 +142,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 editTextSearch.setText("");
-                String f_in="storage/emulated/0/Download/Atrangi_Re.mp4";
-
-                int rc = FFmpeg.execute("-i "+ f_in+" storage/emulated/0/Download/file2.wav");
-
-                if (rc == RETURN_CODE_SUCCESS) {
-                    Log.i(Config.TAG, "Command execution completed successfully.");
-                } else if (rc == RETURN_CODE_CANCEL) {
-                    Log.i(Config.TAG, "Command execution cancelled by user.");
-                } else {
-                    Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
-                    Config.printLastCommandOutput(Log.INFO);
-                }
+//                String f_in="storage/emulated/0/Download/Atrangi_Re.mp4";
+//
+//                int rc = FFmpeg.execute("-i "+ f_in+" storage/emulated/0/Download/file2.wav");
+//
+//                if (rc == RETURN_CODE_SUCCESS) {
+//                    Log.i(Config.TAG, "Command execution completed successfully.");
+//                } else if (rc == RETURN_CODE_CANCEL) {
+//                    Log.i(Config.TAG, "Command execution cancelled by user.");
+//                } else {
+//                    Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+//                    Config.printLastCommandOutput(Log.INFO);
+//                }
 
 
             }
@@ -157,15 +163,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String word=editTextSearch.getText().toString();
-
-                ArrayList<String> audioList=searchAudioFiles.searchFiles(word);
-//                if(mplayer!=null){
-//                    mplayer.stop();
-//                    mplayer.reset();
-//                }
-                audioAdaptor adaptor=new audioAdaptor(audioList,getApplication(),mplayer);
-                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.super.getApplicationContext()));
-                recyclerView.setAdapter(adaptor);
+                if(word.length()==0){
+                    editTextSearch.setText("Word Can Not be Empty");
+                }else{
+                    ArrayList<String> audioList=searchAudioFiles.searchFiles(word);
+                    if(mplayer!=null){
+                        mplayer.stop();
+                        mplayer.reset();
+                    }
+                    audioAdaptor adaptor=new audioAdaptor(audioList,getApplication(),mplayer);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.super.getApplicationContext()));
+                    recyclerView.setAdapter(adaptor);
+                }
 
             }
         });
@@ -173,13 +182,27 @@ public class MainActivity extends AppCompatActivity {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(buttonStart.getText().toString().toLowerCase().equals("start service")){
+                    Log.d("tilak","service start");
+                    startService(serviceIntent);
+                    buttonStart.setText("stop service");
+                }else if(buttonStart.getText().toString().toLowerCase().equals("stop service")){
+                    Log.d("tilak","service stop");
+                    stopService(serviceIntent);
+                    buttonStart.setText("start service");
+                }
 
-                startService(serviceIntent);
 
             }
         });
     }
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        String start_button_state=buttonStart.getText().toString();
+        outState.putString("state",start_button_state);
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

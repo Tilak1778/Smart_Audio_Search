@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_constraint"
 
     >
 
@@ -25,7 +26,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_textview"
-        android:text="Time :"
+
         />
     <TextView
         android:id="@+id/textview_count"
@@ -34,7 +35,7 @@
         app:layout_constraintLeft_toRightOf="@id/textview_timeStamp"
         app:layout_constraintTop_toBottomOf="@+id/item_textview"
         app:layout_constraintRight_toLeftOf="@id/equalizer_anim"
-        android:text="Count :"
+
         />
 
     <es.claucookie.miniequalizerlibrary.EqualizerView
