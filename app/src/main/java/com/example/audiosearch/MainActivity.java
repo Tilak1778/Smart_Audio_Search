@@ -3,27 +3,37 @@ package com.example.audiosearch;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     String filename;
     SearchAudioFiles searchAudioFiles;
     public static MediaPlayer mplayer;
+    private static final int STORAGE_PERMISSION_CODE = 101;
 
 
 
@@ -59,7 +70,30 @@ public class MainActivity extends AppCompatActivity {
         //filename="android.resource:///com.example.audiosearch/raw/audio.mp3";
         filename = "storage/emulated/0/Music/audio_1.opus";
         mplayer=new MediaPlayer();
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        //    checkPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
+        //}
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Snackbar.make(findViewById(android.R.id.content), "Permission needed!", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Settings", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
+                                try {
+                                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+                                    startActivity(intent);
+                                } catch (Exception ex) {
+                                    Intent intent = new Intent();
+                                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                                    startActivity(intent);
+                                }
+                            }
+                        })
+                        .show();
+            }
+        }
 
 
         File f_map = new File("/data/data/" + getPackageName() +  "/shared_prefs/" + "MAP_PERF" + ".xml");
@@ -144,8 +178,26 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
     }
+
+    // Function to check and request permission.
+        public void checkPermission( String permission, int requestCode)
+        {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
+                // Requesting the permission
+                ActivityCompat.requestPermissions(MainActivity.this, new String[] { permission }, requestCode);
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Permission already granted", Toast.LENGTH_SHORT).show();
+            }
+        }
 
     @Override
     protected void onDestroy() {

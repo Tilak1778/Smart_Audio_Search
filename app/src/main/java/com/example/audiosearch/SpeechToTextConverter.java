@@ -60,7 +60,7 @@ public class SpeechToTextConverter {
             // Configure request with local raw PCM audio
             RecognitionConfig config=null;
             String ext=getExtension(fileName);
-            if(ext=="opus"){
+            if(ext.equals("opus")){
                 Log.d("tilak","extension: "+ext);
                 config =
                         RecognitionConfig.newBuilder()
@@ -70,16 +70,15 @@ public class SpeechToTextConverter {
                                 .setEnableWordTimeOffsets(true)
                                 .build();
 
-            }else if(ext=="wav"){
+            }else if(ext.equals("wav")){
                 Log.d("tilak","extension: "+ext);
                 config =
                         RecognitionConfig.newBuilder()
                                 .setEncoding(RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED)
                                 .setLanguageCode("en-US")
-                                .setSampleRateHertz(16000)
                                 .setEnableWordTimeOffsets(true)
                                 .build();
-            }else if(ext=="flac"){
+            }else if(ext.equals("flac")){
                 Log.d("tilak","extension: "+ext);
                 config =
                         RecognitionConfig.newBuilder()
@@ -87,7 +86,7 @@ public class SpeechToTextConverter {
                                 .setLanguageCode("en-US")
                                 .setEnableWordTimeOffsets(true)
                                 .build();
-            }else if(ext=="amr"){
+            }else if(ext.equals("amr")){
                 Log.d("tilak","extension: "+ext);
                 config =
                         RecognitionConfig.newBuilder()

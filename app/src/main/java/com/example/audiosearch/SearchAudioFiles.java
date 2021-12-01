@@ -45,10 +45,7 @@ public class SearchAudioFiles {
                         matchedFiles.add(entry.getValue().toString());
                         break;
                     }
-
-
                 }
-
 
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
