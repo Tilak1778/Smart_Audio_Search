@@ -127,7 +127,7 @@ public class SearchAudioFiles {
         return pos;
     }
 
-    public ArrayList<Integer> getCount(){
+    public ArrayList<Integer> getCountArray(){
         return occurences;
     }
     public ArrayList<Integer> getTimeArray(){
@@ -137,7 +137,8 @@ public class SearchAudioFiles {
 
     public ArrayList<String> getMatchedFiles(String searchedWord){
         ArrayList<String> matchedFiles=new ArrayList<>();
-
+        occurences.clear();
+        timestamp.clear();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
             Log.d("map values", entry.getKey() + ": " + entry.getValue().toString());
             String textPath=entry.getKey();

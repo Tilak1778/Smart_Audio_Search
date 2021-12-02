@@ -65,7 +65,7 @@ public class SpeechToTextConverter {
                 config =
                         RecognitionConfig.newBuilder()
                                 .setEncoding(RecognitionConfig.AudioEncoding.OGG_OPUS)
-                                .setLanguageCode("en-US")
+                                .setLanguageCode("en-IN")
                                 .setSampleRateHertz(16000)
                                 .setEnableWordTimeOffsets(true)
                                 .build();
@@ -75,7 +75,7 @@ public class SpeechToTextConverter {
                 config =
                         RecognitionConfig.newBuilder()
                                 .setEncoding(RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED)
-                                .setLanguageCode("en-US")
+                                .setLanguageCode("en-IN")
                                 .setEnableWordTimeOffsets(true)
                                 .build();
             }else if(ext.equals("flac")){
@@ -83,7 +83,7 @@ public class SpeechToTextConverter {
                 config =
                         RecognitionConfig.newBuilder()
                                 .setEncoding(RecognitionConfig.AudioEncoding.FLAC)
-                                .setLanguageCode("en-US")
+                                .setLanguageCode("en-IN")
                                 .setEnableWordTimeOffsets(true)
                                 .build();
             }else if(ext.equals("amr")){
@@ -91,7 +91,7 @@ public class SpeechToTextConverter {
                 config =
                         RecognitionConfig.newBuilder()
                                 .setEncoding(RecognitionConfig.AudioEncoding.AMR_WB)
-                                .setLanguageCode("en-US")
+                                .setLanguageCode("en-IN")
                                 .setEnableWordTimeOffsets(true)
                                 .setSampleRateHertz(16000)
                                 .build();
@@ -100,7 +100,7 @@ public class SpeechToTextConverter {
                 config =
                         RecognitionConfig.newBuilder()
                                 .setEncoding(RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED)
-                                .setLanguageCode("en-US")
+                                .setLanguageCode("en-IN")
                                 .setEnableWordTimeOffsets(true)
 
                                 .build();

@@ -4,6 +4,7 @@ import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -23,6 +24,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
@@ -33,11 +35,14 @@ import android.widget.Toast;
 
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     Button buttonClear;
@@ -46,11 +51,14 @@ public class MainActivity extends AppCompatActivity {
     EditText editTextSearch;
     Intent serviceIntent;
     RecyclerView recyclerView;
+    FloatingActionButton fab;
+
     SpeechToTextConverter obj;
     String filename;
     SearchAudioFiles searchAudioFiles;
     public static MediaPlayer mplayer;
     private static final int STORAGE_PERMISSION_CODE = 101;
+    private static final int REQUEST_CODE_SPEECH_INPUT=100;
 
 
 
@@ -64,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
          editTextSearch=findViewById(R.id.edittext_search);
          recyclerView=findViewById(R.id.recyclerview);
          buttonStart=findViewById(R.id.button_start);
+         fab=findViewById(R.id.fab);
          serviceIntent=new Intent(this,audioTrackerService.class);
          obj=new SpeechToTextConverter(getApplicationContext());
          searchAudioFiles=new SearchAudioFiles(getApplicationContext());
@@ -167,13 +176,26 @@ public class MainActivity extends AppCompatActivity {
                     editTextSearch.setText("Word Can Not be Empty");
                 }else{
                     ArrayList<String> audioList=searchAudioFiles.searchFiles(word);
+                    ArrayList<Integer> timeStamps=searchAudioFiles.getTimeArray();
+                    ArrayList<Integer> occureances=searchAudioFiles.getCountArray();
+//                    for(int i=0;i<timeStamps.size();i++){
+//                        System.out.println("tilak "+timeStamps.get(i).toString());
+//                    }
+
                     if(mplayer!=null){
                         mplayer.stop();
                         mplayer.reset();
                     }
-                    audioAdaptor adaptor=new audioAdaptor(audioList,getApplication(),mplayer);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.super.getApplicationContext()));
-                    recyclerView.setAdapter(adaptor);
+                    //if(recyclerView.getAdapter()==null){
+                        audioAdaptor adaptor=new audioAdaptor(audioList,timeStamps,occureances,getApplication(),mplayer);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.super.getApplicationContext()));
+                        recyclerView.setAdapter(adaptor);
+                    //}else{
+                       // recyclerView.getAdapter().notifyDataSetChanged();
+                    //}
+
+
+
                 }
 
             }
@@ -195,6 +217,46 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent
+                        = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+                        Locale.getDefault());
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
+
+                try {
+                    startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
+                }
+                catch (Exception e) {
+                    Toast
+                            .makeText(MainActivity.this, " " + e.getMessage(),
+                                    Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+        });
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    @Nullable Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                ArrayList<String> result = data.getStringArrayListExtra(
+                        RecognizerIntent.EXTRA_RESULTS);
+                editTextSearch.setText(
+                        Objects.requireNonNull(result).get(0));
+            }
+        }
     }
 
     @Override

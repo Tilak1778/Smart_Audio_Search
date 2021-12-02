@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.TintableBackgroundView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
@@ -24,6 +25,8 @@ import es.claucookie.miniequalizerlibrary.EqualizerView;
 public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> {
 
     private ArrayList<String> mAudioList;
+    private ArrayList<Integer> mTimeArray;
+    private ArrayList<Integer> mCountArray;
     SearchAudioFiles searchAudioFiles;
     Context mContext;
     MediaPlayer mMediaPlayer;
@@ -31,12 +34,13 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
     int indexOfPlaying=-1;
 
 
-    public audioAdaptor(ArrayList<String> list,Context context,MediaPlayer player){
+    public audioAdaptor(ArrayList<String> list,ArrayList<Integer> TimeArray,ArrayList<Integer> CountArray,Context context,MediaPlayer player){
         mAudioList=list;
         mContext=context;
         mMediaPlayer=player;
         soundPlayer=new SoundPlayer();
-
+        mTimeArray=TimeArray;
+        mCountArray=CountArray;
 
     }
 
@@ -64,10 +68,13 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String item=mAudioList.get(position);
+        Integer timeStamp=mTimeArray.get(position);
+        Integer count=mCountArray.get(position);
+
         holder.bind(position);
         holder.itemTextView.setText(getTitle(item));
-        holder.countTextView.setText("Count: ");
-        holder.timeTextView.setText("Time: ");
+        holder.countTextView.setText("Occurance: "+count);
+        holder.timeTextView.setText("Time Stamp: "+timeStamp/1000+" sec");
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,7 +110,7 @@ public class audioAdaptor extends RecyclerView.Adapter<audioAdaptor.ViewHolder> 
                         }
                         mMediaPlayer.setDataSource(mContext, Uri.parse(audioPath));
                         mMediaPlayer.prepare();
-                        //mMediaPlayer.seekTo(10000);
+                        mMediaPlayer.seekTo((timeStamp-1000)<0?0:timeStamp-1000);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
